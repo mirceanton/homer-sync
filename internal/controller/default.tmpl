@@ -1,0 +1,25 @@
+---
+title: "{{ .Title }}"
+subtitle: "{{ .Subtitle }}"
+header: true
+footer: false
+columns: {{ .Columns }}
+connectivityCheck: true
+
+links: []
+
+services:
+{{- range .Groups }}
+  - name: "{{ .Name }}"
+    icon: "{{ .Icon }}"
+    items:
+{{- range .Items }}
+      - name: "{{ .Name }}"
+        subtitle: "{{ .Subtitle }}"
+        url: "{{ .URL }}"
+        target: "_blank"
+{{- if .Icon }}
+        logo: "assets/icons/{{ .Icon }}.svg"
+{{- end }}
+{{- end }}
+{{- end }}

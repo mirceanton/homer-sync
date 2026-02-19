@@ -1,0 +1,107 @@
+version: 2
+
+project_name: homer-sync
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: homer-sync
+    main: ./cmd
+    binary: homer-sync
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -w -s
+      - -X main.version={{ .Version }}
+      - -X main.commit={{ .Commit }}
+      - -X main.date={{ .Date }}
+
+archives:
+  - id: homer-sync
+    builds:
+      - homer-sync
+    name_template: >-
+      {{ .ProjectName }}_{{ .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "arm64" }}arm64
+      {{- else }}{{ .Arch }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+dockers:
+  - id: homer-sync-amd64
+    ids:
+      - homer-sync
+    goos: linux
+    goarch: amd64
+    image_templates:
+      - ghcr.io/mirceanton/homer-sync:{{ .Tag }}-amd64
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - --platform=linux/amd64
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.created={{ .Date }}
+      - --label=org.opencontainers.image.source=https://github.com/mirceanton/homer-sync
+
+  - id: homer-sync-arm64
+    ids:
+      - homer-sync
+    goos: linux
+    goarch: arm64
+    image_templates:
+      - ghcr.io/mirceanton/homer-sync:{{ .Tag }}-arm64
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - --platform=linux/arm64
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.created={{ .Date }}
+      - --label=org.opencontainers.image.source=https://github.com/mirceanton/homer-sync
+
+docker_manifests:
+  - name_template: ghcr.io/mirceanton/homer-sync:{{ .Tag }}
+    image_templates:
+      - ghcr.io/mirceanton/homer-sync:{{ .Tag }}-amd64
+      - ghcr.io/mirceanton/homer-sync:{{ .Tag }}-arm64
+
+  - name_template: ghcr.io/mirceanton/homer-sync:latest
+    image_templates:
+      - ghcr.io/mirceanton/homer-sync:{{ .Tag }}-amd64
+      - ghcr.io/mirceanton/homer-sync:{{ .Tag }}-arm64
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
+      - Merge pull request
+      - Merge branch
+
+release:
+  github:
+    owner: mirceanton
+    name: homer-sync
+  draft: false
+  prerelease: auto

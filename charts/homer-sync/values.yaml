@@ -21,9 +21,9 @@ securityContext:
 resources:
   requests:
     cpu: 5m
-    memory: 64Mi
+    memory: 16Mi
   limits:
-    memory: 128Mi
+    memory: 32Mi
 
 env:
   # -- Comma-separated list of gateway names to filter HTTPRoutes by.
@@ -39,14 +39,14 @@ env:
   HOMER_SYNC_DAEMON_MODE: "true"
   # -- Seconds to wait between scans in daemon mode.
   HOMER_SYNC_SCAN_INTERVAL: "300"
-  # -- Log verbosity: DEBUG, INFO, WARNING, ERROR.
-  HOMER_SYNC_LOG_LEVEL: "INFO"
+  # -- Log verbosity: debug, info, warn, error.
+  HOMER_SYNC_LOG_LEVEL: "info"
   # -- Homer dashboard title.
   HOMER_SYNC_TITLE: "Home Dashboard"
   # -- Homer dashboard subtitle.
   HOMER_SYNC_SUBTITLE: ""
   # -- Number of service columns in the Homer layout.
   HOMER_SYNC_COLUMNS: "5"
-  # -- Path to a custom Jinja2 template. Falls back to the built-in
-  # template when unset or the file does not exist.
+  # -- Path to a custom Go template file. Falls back to the built-in
+  # embedded template when unset.
   HOMER_SYNC_TEMPLATE_PATH: ""
