@@ -1,0 +1,3 @@
+# Downloaded Helm chart dependencies (fetched by helm dependency update in CI)
+charts/*/charts/
+charts/*/Chart.lock

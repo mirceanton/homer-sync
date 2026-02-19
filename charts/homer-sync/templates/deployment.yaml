@@ -1,0 +1,60 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "homer-sync.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "homer-sync.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "homer-sync.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      serviceAccountName: {{ include "homer-sync.serviceAccountName" . }}
+      securityContext:
+        runAsUser: {{ .Values.podSecurityContext.runAsUser }}
+        runAsGroup: {{ .Values.podSecurityContext.runAsGroup }}
+        runAsNonRoot: {{ .Values.podSecurityContext.runAsNonRoot }}
+      containers:
+        - name: app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: HOMER_SYNC_GATEWAY_NAMES
+              value: {{ .Values.env.HOMER_SYNC_GATEWAY_NAMES | quote }}
+            - name: HOMER_SYNC_DOMAIN_SUFFIXES
+              value: {{ .Values.env.HOMER_SYNC_DOMAIN_SUFFIXES | quote }}
+            - name: HOMER_SYNC_CONFIGMAP_NAME
+              value: {{ .Values.env.HOMER_SYNC_CONFIGMAP_NAME | quote }}
+            - name: HOMER_SYNC_DAEMON_MODE
+              value: {{ .Values.env.HOMER_SYNC_DAEMON_MODE | quote }}
+            - name: HOMER_SYNC_SCAN_INTERVAL
+              value: {{ .Values.env.HOMER_SYNC_SCAN_INTERVAL | quote }}
+            - name: HOMER_SYNC_LOG_LEVEL
+              value: {{ .Values.env.HOMER_SYNC_LOG_LEVEL | quote }}
+            - name: HOMER_SYNC_TITLE
+              value: {{ .Values.env.HOMER_SYNC_TITLE | quote }}
+            - name: HOMER_SYNC_SUBTITLE
+              value: {{ .Values.env.HOMER_SYNC_SUBTITLE | quote }}
+            - name: HOMER_SYNC_COLUMNS
+              value: {{ .Values.env.HOMER_SYNC_COLUMNS | quote }}
+            - name: HOMER_SYNC_TEMPLATE_PATH
+              value: {{ .Values.env.HOMER_SYNC_TEMPLATE_PATH | quote }}
+          securityContext:
+            allowPrivilegeEscalation: {{ .Values.securityContext.allowPrivilegeEscalation }}
+            readOnlyRootFilesystem: {{ .Values.securityContext.readOnlyRootFilesystem }}
+            capabilities:
+              drop: {{ toYaml .Values.securityContext.capabilities.drop | nindent 14 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

@@ -1,0 +1,7 @@
+---
+apiVersion: v2
+name: homer-sync
+description: Automatically generate a Homer dashboard config from Kubernetes HTTPRoutes
+type: application
+version: 0.0.0 # replaced by CI with the git tag (v-prefix stripped)
+appVersion: "0.0.0" # replaced by CI with the full git tag

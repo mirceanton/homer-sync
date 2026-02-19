@@ -1,0 +1,52 @@
+---
+# -- Name of the ServiceAccount created by this chart.
+serviceAccountName: homer-sync
+
+image:
+  repository: ghcr.io/mirceanton/homer-sync
+  tag: latest # replaced by Renovate in the consuming GitOps repo
+  pullPolicy: IfNotPresent
+
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+
+resources:
+  requests:
+    cpu: 5m
+    memory: 64Mi
+  limits:
+    memory: 128Mi
+
+env:
+  # -- Comma-separated list of gateway names to filter HTTPRoutes by.
+  # When set (together with DOMAIN_SUFFIXES), routes are included unless
+  # explicitly opted out with home.mirceanton.com/enabled: "false".
+  HOMER_SYNC_GATEWAY_NAMES: ""
+  # -- Comma-separated domain suffixes to filter hostnames by.
+  # e.g. ".home.mirceanton.com"
+  HOMER_SYNC_DOMAIN_SUFFIXES: ""
+  # -- Name of the ConfigMap to write the Homer config into.
+  HOMER_SYNC_CONFIGMAP_NAME: "homer-config"
+  # -- Run continuously (true) or exit after one sync (false).
+  HOMER_SYNC_DAEMON_MODE: "true"
+  # -- Seconds to wait between scans in daemon mode.
+  HOMER_SYNC_SCAN_INTERVAL: "300"
+  # -- Log verbosity: DEBUG, INFO, WARNING, ERROR.
+  HOMER_SYNC_LOG_LEVEL: "INFO"
+  # -- Homer dashboard title.
+  HOMER_SYNC_TITLE: "Home Dashboard"
+  # -- Homer dashboard subtitle.
+  HOMER_SYNC_SUBTITLE: ""
+  # -- Number of service columns in the Homer layout.
+  HOMER_SYNC_COLUMNS: "5"
+  # -- Path to a custom Jinja2 template. Falls back to the built-in
+  # template when unset or the file does not exist.
+  HOMER_SYNC_TEMPLATE_PATH: ""
