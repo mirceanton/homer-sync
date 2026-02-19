@@ -1,0 +1,25 @@
+---
+title: "{{ title }}"
+subtitle: "{{ subtitle }}"
+header: true
+footer: false
+columns: {{ columns }}
+connectivityCheck: true
+
+links: []
+
+services:
+{% for group_name, items in groups | dictsort %}
+  - name: "{{ group_name }}"
+    icon: "{{ items[0].group_icon }}"
+    items:
+{% for item in items %}
+      - name: "{{ item.name }}"
+        subtitle: "{{ item.subtitle }}"
+        url: "{{ item.url }}"
+        target: "_blank"
+{% if item.icon %}
+        logo: "assets/icons/{{ item.icon }}.svg"
+{% endif %}
+{% endfor %}
+{% endfor %}
